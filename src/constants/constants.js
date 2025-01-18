@@ -1,0 +1,24 @@
+const BASE_URL = "https://api.football-data.org/v4";
+
+// TIMES
+const ONE_MINUTE = 60 * 1000;
+const FIVE_MINUTES = 5 * ONE_MINUTE;
+const ONE_HOUR = 60 * ONE_MINUTE;
+const ONE_DAY = 24 * ONE_HOUR;
+const ONE_WEEK = 7 * ONE_DAY;
+
+// COMPETITIONS
+const PREMIER_LEAGUE_CODE = "PL";
+const CHAMPIONS_LEAGUE_CODE = "CL";
+
+const COMPETITIONS = {
+    "Premier League": [PREMIER_LEAGUE_CODE],
+    "Champions League": [CHAMPIONS_LEAGUE_CODE],
+}
+
+// RATE LIMIT
+const RATE_LIMIT_TIME = 15 * ONE_MINUTE;
+
+module.exports = {
+    BASE_URL, ONE_MINUTE, FIVE_MINUTES, ONE_HOUR, ONE_DAY, ONE_WEEK, PREMIER_LEAGUE_CODE, CHAMPIONS_LEAGUE_CODE, COMPETITIONS
+}

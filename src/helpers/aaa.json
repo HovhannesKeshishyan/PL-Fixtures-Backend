@@ -1,0 +1,20 @@
+{
+  "data": [
+    {
+      "homeTeam": {
+        "id": 338,
+        "name": "Leicester City FC",
+        "shortName": "Leicester City",
+        "tla": "LEI",
+        "crest": "https://crests.football-data.org/338.png"
+      },
+      "awayTeam": {
+        "id": 354,
+        "name": "Crystal Palace FC",
+        "shortName": "Crystal Palace",
+        "tla": "CRY",
+        "crest": "https://crests.football-data.org/354.png"
+      }
+    }
+  ]
+}

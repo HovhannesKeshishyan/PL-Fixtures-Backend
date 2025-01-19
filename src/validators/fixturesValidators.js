@@ -10,7 +10,7 @@ const teamsFixturesValidator = (req, res, next) => {
     if (!ids || !ids.length) errorMessage = "ids is required";
     else if (!Array.isArray(ids)) errorMessage = "id must be an array";
     else if (ids.some(id => typeof id !== "number")) errorMessage = "id must be a number";
-    // fixtures count
+    // fixtures-list count
     if (limit && !parseInt(limit)) errorMessage = "Limit must be a number";
     // competitions
     if (competitions) {

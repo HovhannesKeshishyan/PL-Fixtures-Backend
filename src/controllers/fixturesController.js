@@ -21,7 +21,9 @@ const cachedData = {
         teamIds: []
     },
 
-    fixtures: {}
+    fixtures: {
+        lastUpdated: null,
+    }
 }
 
 const fetchLeagueTeams = async (leagueCode = PREMIER_LEAGUE_CODE) => {
@@ -61,7 +63,7 @@ const getTeamsFixtures = async (req, res, next) => {
     }
     const ids = req.body.ids;
     const limit = req.query.limit || 5;
-    const competitions = req.body.competitions || [PREMIER_LEAGUE_CODE, CHAMPIONS_LEAGUE_CODE];
+    //const competitions = req.body.competitions || [PREMIER_LEAGUE_CODE, CHAMPIONS_LEAGUE_CODE];
 
     const invalidIds = ids.filter(id => !cachedData.teams.teamIds.includes(id));
     if (invalidIds.length) {
@@ -71,28 +73,34 @@ const getTeamsFixtures = async (req, res, next) => {
     }
 
     try {
-        let response = await Promise.all(ids.map(async (id) => {
-            const cacheKey = `${id}-${competitions.toString()}`;
-            const isCacheValid = cachedData.fixtures[cacheKey] && (Date.now() - cachedData.fixtures[cacheKey].lastUpdated) < FIVE_MINUTES;
-            if (isCacheValid) {
-                console.log("form cache: " + id);
-                return cachedData.fixtures[cacheKey];
-            }
+        if (cachedData.fixtures.lastUpdated && (Date.now() - cachedData.fixtures.lastUpdated < FIVE_MINUTES)) {
+            console.log("From Cache");
+        } else {
+            cachedData.fixtures = {}
+            const {data} = await axios.get(`/competitions/${PREMIER_LEAGUE_CODE}/matches?status=SCHEDULED`);
+            data.matches.forEach(match => {
+                const homeTeamId = match.homeTeam.id;
+                const awayTeamId = match.awayTeam.id;
+                cachedData.fixtures[homeTeamId] = cachedData.fixtures[homeTeamId] || {teamId: homeTeamId, matches: []};
+                cachedData.fixtures[awayTeamId] = cachedData.fixtures[awayTeamId] || {teamId: awayTeamId, matches: []};
+                cachedData.fixtures[homeTeamId].matches.push(match);
+                cachedData.fixtures[awayTeamId].matches.push(match);
+            })
+            cachedData.fixtures.lastUpdated = Date.now();
+            console.log("From API");
+        }
 
-            const {data} = await axios.get(`/teams/${id}/matches?status=SCHEDULED&competitions=${competitions}`);
-            console.log("Form API: " + id);
-            const matches = getFixturesDTO(data);
-            cachedData.fixtures[cacheKey] = {
-                teamId: id,
-                matches: matches,
-                lastUpdated: Date.now(),
+        const data = ids.map((id) => {
+            const data = cachedData.fixtures[id];
+            if (limit) {
+                data.matches = [...data.matches].slice(0, limit);
             }
-            return cachedData.fixtures[cacheKey];
-        }));
-        response.forEach(item => item.matches = item.matches.slice(0, limit));
-        res.json(response);
-    } catch (err) {
-        next(err);
+            return data;
+        })
+
+        res.json(data);
+    } catch (error) {
+        next(error);
     }
 }
 

@@ -5,10 +5,9 @@ const {
     PREMIER_LEAGUE_CODE,
     FIVE_MINUTES,
     ONE_WEEK,
-    COMPETITIONS,
-    CHAMPIONS_LEAGUE_CODE
+    COMPETITIONS
 } = require("../constants/constants");
-const {getTeamsDTO, getFixturesDTO} = require("../helpers/helpers");
+const {getTeamsDTO} = require("../helpers/helpers");
 const {BAD_REQUEST} = require("http-status-codes");
 
 axios.defaults.baseURL = BASE_URL;
@@ -62,7 +61,7 @@ const getTeamsFixtures = async (req, res, next) => {
         await fetchLeagueTeams();
     }
     const ids = req.body.ids;
-    const limit = req.query.limit || 5;
+    const limit = req.body.limit || 5;
     //const competitions = req.body.competitions || [PREMIER_LEAGUE_CODE, CHAMPIONS_LEAGUE_CODE];
 
     const invalidIds = ids.filter(id => !cachedData.teams.teamIds.includes(id));
@@ -92,7 +91,7 @@ const getTeamsFixtures = async (req, res, next) => {
 
         const data = ids.map((id) => {
             const data = cachedData.fixtures[id];
-            if (limit) {
+            if (limit && limit !== "all") {
                 data.matches = [...data.matches].slice(0, limit);
             }
             return data;

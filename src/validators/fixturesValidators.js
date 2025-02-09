@@ -11,7 +11,7 @@ const teamsFixturesValidator = (req, res, next) => {
     else if (!Array.isArray(ids)) errorMessage = "id must be an array";
     else if (ids.some(id => typeof id !== "number")) errorMessage = "id must be a number";
     // fixtures-list count
-    if (limit && !parseInt(limit)) errorMessage = "Limit must be a number";
+    if (limit && !parseInt(limit) && limit !== "all") errorMessage = "Limit must be a number";
     // competitions
     if (competitions) {
         if (!Array.isArray(competitions)) errorMessage = "Competitions must be an array";

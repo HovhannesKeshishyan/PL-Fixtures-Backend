@@ -17,7 +17,7 @@ Hovhannes Keshishyan
 
 ## For Frontend configuration
 
-### Copy Backend project from Git repo from [This GitHub repo](https://github.com/HovhannesKeshishyan/PL-Fixtures)
+### Copy Frontend project from Git repo from [This GitHub repo](https://github.com/HovhannesKeshishyan/PL-Fixtures)
 ### Config project as described in README.MD file and run.
 
 ## Project setup

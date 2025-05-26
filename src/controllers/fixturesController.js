@@ -90,7 +90,16 @@ const getTeamsFixtures = async (req, res, next) => {
         }
 
         const data = ids.map((id) => {
-            const teamData = { ...cachedData.fixtures[id] };  // Create a shallow copy of teamData
+            let teamData;
+            // Create a shallow copy of teamData
+            if(cachedData.fixtures[id]) {
+                teamData = { ...cachedData.fixtures[id] }
+            }
+            // when no fixtures create empty array
+            else {
+                teamData = {teamId: id, matches: []}
+            }
+
             if (limit && limit !== "all") {
                 teamData.matches = [...teamData.matches].slice(0, limit);
             }

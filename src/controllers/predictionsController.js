@@ -18,12 +18,13 @@ const systemInstruction =
 
 const model = "gemini-2.5-flash";
 
-function createUserPrompt(homeTeam, awayTeam) {
-    return `Predict the final score for the match: ${homeTeam} - ${awayTeam}`;
+function createUserPrompt(homeTeam, awayTeam, matchDate) {
+    return `Predict the final score for the match: ${homeTeam} vs ${awayTeam}, scheduled for ${matchDate}.`;
 }
 
 async function predictScores(req, res, next) {
-    const {matchID, homeTeam, awayTeam} = req.body;
+    const {matchID, homeTeam, awayTeam, matchDate} = req.body;
+
     if(CACHED_DATA.predictions[matchID]) {
         console.log(`Prediction for ${homeTeam} - ${awayTeam} returned from cache, match id is ${matchID}`);
         return res.json({score: CACHED_DATA.predictions[matchID].score});
@@ -32,7 +33,7 @@ async function predictScores(req, res, next) {
     try {
         const response = await ai.models.generateContent({
             model,
-            contents: createUserPrompt(homeTeam, awayTeam),
+            contents: createUserPrompt(homeTeam, awayTeam, matchDate),
             config: {
                 systemInstruction
             },

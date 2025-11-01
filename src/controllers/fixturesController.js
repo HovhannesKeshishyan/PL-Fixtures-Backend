@@ -90,6 +90,11 @@ const getTeamsFixtures = async (req, res, next) => {
                 teamData = {teamId: id, matches: []}
             }
 
+            // add prediction if exists
+            teamData.matches.forEach(match => {
+                match.aiPrediction = CACHED_DATA.predictions[match.id] || null;
+            })
+
             if (limit && limit !== "all") {
                 teamData.matches = [...teamData.matches].slice(0, limit);
             }

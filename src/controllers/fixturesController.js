@@ -1,23 +1,23 @@
 const axios = require("axios");
+const {BAD_REQUEST} = require("http-status-codes");
 
 const {
     BASE_URL,
     PREMIER_LEAGUE_CODE,
     FIVE_MINUTES,
-    ONE_WEEK,
-    COMPETITIONS
+    ONE_WEEK
 } = require("../constants/constants");
+
 const {getTeamsDTO} = require("../helpers/helpers");
-const {BAD_REQUEST} = require("http-status-codes");
 
 const {CACHED_DATA} = require("../cache/index");
 
 axios.defaults.baseURL = BASE_URL;
 axios.defaults.headers.common['X-Auth-Token'] = process.env.API_KEY;
 
-const fetchLeagueTeams = async (leagueCode = PREMIER_LEAGUE_CODE) => {
+const fetchTeams = async () => {
     try {
-        const {data} = await axios.get("/competitions/" + leagueCode + "/teams");
+        const {data} = await axios.get("/competitions/" + PREMIER_LEAGUE_CODE + "/teams");
         const teams = getTeamsDTO(data.teams);
 
         CACHED_DATA.teams.value = teams;
@@ -31,8 +31,6 @@ const fetchLeagueTeams = async (leagueCode = PREMIER_LEAGUE_CODE) => {
 }
 
 const getLeagueTeams = async (req, res, next) => {
-    const leagueCode = req.query.leagueCode;
-
     const now = Date.now();
     const isCacheValid = CACHED_DATA.teams.value.length > 0 &&
         (CACHED_DATA.teams.lastUpdated && (now - CACHED_DATA.teams.lastUpdated < ONE_WEEK));
@@ -41,18 +39,17 @@ const getLeagueTeams = async (req, res, next) => {
         return res.json(CACHED_DATA.teams.value);
     }
 
-    const [error, teams] = await fetchLeagueTeams(leagueCode);
+    const [error, teams] = await fetchTeams();
     if (error) return next(error)
     res.json(teams);
 }
 
 const getTeamsFixtures = async (req, res, next) => {
     if (!CACHED_DATA.teams.teamIds.length) {
-        await fetchLeagueTeams();
+        await fetchTeams();
     }
     const ids = req.body.ids;
     const limit = req.body.limit || 5;
-    //const competitions = req.body.competitions || [PREMIER_LEAGUE_CODE, CHAMPIONS_LEAGUE_CODE];
 
     const invalidIds = ids.filter(id => !CACHED_DATA.teams.teamIds.includes(id));
     if (invalidIds.length) {
@@ -107,8 +104,4 @@ const getTeamsFixtures = async (req, res, next) => {
     }
 }
 
-const getCompetitions = async (req, res, _next) => {
-    res.json(COMPETITIONS);
-}
-
-module.exports = {getLeagueTeams, getTeamsFixtures, getCompetitions}
+module.exports = {getLeagueTeams, getTeamsFixtures}

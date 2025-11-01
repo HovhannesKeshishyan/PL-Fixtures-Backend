@@ -21,7 +21,7 @@ app.use(router);
 
 app.use(errorHandler);
 
-function errorHandler(err, req, res, next) {
+function errorHandler(err, req, res, _next) {
     console.log("***** ERROR LOG *****");
     console.log(err);
     console.log("***** ERROR LOG *****");

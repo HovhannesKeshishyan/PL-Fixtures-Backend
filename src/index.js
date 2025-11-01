@@ -22,7 +22,9 @@ app.use(router);
 app.use(errorHandler);
 
 function errorHandler(err, req, res, next) {
+    console.log("***** ERROR LOG *****");
     console.log(err);
+    console.log("***** ERROR LOG *****");
     res.status(err.status || INTERNAL_SERVER_ERROR).send(err.message || "Server Error");
 }
 

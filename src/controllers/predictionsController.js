@@ -40,13 +40,14 @@ async function predictScores(req, res, next) {
         });
 
         const score = response.text.trim();
+        const lastUpdated = new Date();
 
         if (/^\d+-\d+$/.test(score)) {
             CACHED_DATA.predictions[matchUUID] = {
                 score,
-                lastUpdated: new Date(),
+                lastUpdated,
             };
-            return res.json({score});
+            return res.json({score, lastUpdated});
         } else {
             console.error("Unexpected format:", score);
             return next(new Error("Prediction format error"));

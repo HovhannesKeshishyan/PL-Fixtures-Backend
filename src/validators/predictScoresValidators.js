@@ -3,9 +3,9 @@ const {BAD_REQUEST} = require("http-status-codes");
 const isValidString = str => typeof str === "string" && str.trim().length > 0;
 
 const predictScoresValidator = (req, res, next) => {
-    const {matchID, homeTeam, awayTeam, matchDate} = req.body;
+    const {matchUUID, homeTeam, awayTeam, matchDate} = req.body;
 
-    const requiredParams = [matchID, homeTeam, awayTeam, matchDate];
+    const requiredParams = [matchUUID, homeTeam, awayTeam, matchDate];
 
     const allIsValid = requiredParams.every(p => isValidString(p)) && !isNaN(Date.parse(matchDate));
 
@@ -15,7 +15,7 @@ const predictScoresValidator = (req, res, next) => {
 
     let errorMessage = "";
     const emptyParams = [];
-    ["matchID", "homeTeam", "awayTeam", "matchDate"].forEach(param => {
+    ["matchUUID", "homeTeam", "awayTeam", "matchDate"].forEach(param => {
         if (!isValidString(req.body[param])) {
             emptyParams.push(param);
         }

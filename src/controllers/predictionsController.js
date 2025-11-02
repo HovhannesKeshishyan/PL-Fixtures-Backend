@@ -23,11 +23,11 @@ function createUserPrompt(homeTeam, awayTeam, matchDate) {
 }
 
 async function predictScores(req, res, next) {
-    const {matchID, homeTeam, awayTeam, matchDate} = req.body;
+    const {matchUUID, homeTeam, awayTeam, matchDate} = req.body;
 
-    if(CACHED_DATA.predictions[matchID]) {
-        console.log(`Prediction for ${homeTeam} - ${awayTeam} returned from cache, match id is ${matchID}`);
-        return res.json({score: CACHED_DATA.predictions[matchID].score});
+    if(CACHED_DATA.predictions[matchUUID]) {
+        console.log(`Prediction for ${homeTeam} - ${awayTeam} returned from cache, match uuid is ${matchUUID}`);
+        return res.json({score: CACHED_DATA.predictions[matchUUID].score});
     }
 
     try {
@@ -42,7 +42,7 @@ async function predictScores(req, res, next) {
         const score = response.text.trim();
 
         if (/^\d+-\d+$/.test(score)) {
-            CACHED_DATA.predictions[matchID] = {
+            CACHED_DATA.predictions[matchUUID] = {
                 score,
                 lastUpdated: new Date(),
             };

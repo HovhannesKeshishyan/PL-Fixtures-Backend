@@ -10,13 +10,14 @@ const getTeamsDTO = (data) => {
 }
 
 /**
- * @param data - Data from API.
+ * @param matches - Array of matches.
  * @returns {{id: number, utcDate: string, lastUpdated: string, homeTeam: {}, awayTeam: {}}[]}
  */
-const getFixturesDTO = (data) => {
-    return data.matches.map(match => {
+const getFixturesDTO = (matches) => {
+    return matches.map(match => {
         const {id, utcDate, lastUpdated, homeTeam, awayTeam} = match;
-        return {id, utcDate, lastUpdated, homeTeam, awayTeam}
+        const uuid = id + '-' + homeTeam.id + '-' + awayTeam.id; // match id alone sometimes is not unique
+        return {id, uuid, utcDate, lastUpdated, homeTeam, awayTeam}
     });
 }
 

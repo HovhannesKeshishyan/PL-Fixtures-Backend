@@ -8,7 +8,7 @@ const {
     ONE_WEEK
 } = require("../constants/constants");
 
-const {getTeamsDTO} = require("../helpers/helpers");
+const {getTeamsDTO, getFixturesDTO} = require("../helpers/helpers");
 
 const {CACHED_DATA} = require("../cache/index");
 
@@ -64,6 +64,7 @@ const getTeamsFixtures = async (req, res, next) => {
         } else {
             CACHED_DATA.fixtures = {}
             const {data} = await axios.get(`/competitions/${PREMIER_LEAGUE_CODE}/matches?status=SCHEDULED`);
+            data.matches = getFixturesDTO(data.matches);
             data.matches.forEach(match => {
                 const homeTeamId = match.homeTeam.id;
                 const awayTeamId = match.awayTeam.id;
@@ -89,7 +90,7 @@ const getTeamsFixtures = async (req, res, next) => {
 
             // add prediction if exists
             teamData.matches.forEach(match => {
-                match.aiPrediction = CACHED_DATA.predictions[match.id] || null;
+                match.aiPrediction = CACHED_DATA.predictions[match.uuid] || null;
             })
 
             if (limit && limit !== "all") {

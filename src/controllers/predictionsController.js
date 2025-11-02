@@ -1,5 +1,5 @@
 const {GoogleGenAI} = require("@google/genai");
-const {CACHED_DATA} = require("../cache/index");
+const {cache} = require("../cache/index");
 
 const API_KEY = process.env.GEMINI_API_KEY;
 if (!API_KEY) {
@@ -25,9 +25,10 @@ function createUserPrompt(homeTeam, awayTeam, matchDate) {
 async function predictScores(req, res, next) {
     const {matchUUID, homeTeam, awayTeam, matchDate} = req.body;
 
-    if(CACHED_DATA.predictions[matchUUID]) {
+    const predictionFromCache = cache.getPrediction(matchUUID);
+    if (predictionFromCache) {
         console.log(`Prediction for ${homeTeam} - ${awayTeam} returned from cache, match uuid is ${matchUUID}`);
-        return res.json({score: CACHED_DATA.predictions[matchUUID].score});
+        return res.json({score: predictionFromCache.score});
     }
 
     try {
@@ -43,10 +44,10 @@ async function predictScores(req, res, next) {
         const lastUpdated = new Date();
 
         if (/^\d+-\d+$/.test(score)) {
-            CACHED_DATA.predictions[matchUUID] = {
+            cache.setPrediction(matchUUID, {
                 score,
                 lastUpdated,
-            };
+            });
             return res.json({score, lastUpdated});
         } else {
             console.error("Unexpected format:", score);

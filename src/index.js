@@ -2,9 +2,9 @@ import express from "express";
 import helmet from "helmet";
 import rateLimit from "express-rate-limit";
 import cors from "cors";
+import "dotenv/config";
+import "dotenv/config";
 import StatusCodes from "http-status-codes";
-
-process.loadEnvFile();
 
 import corsConfig from "./configs/cors-config.js";
 import rateLimitConfig from "./configs/rate-limit-config.js";

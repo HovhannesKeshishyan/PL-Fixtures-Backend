@@ -1,4 +1,5 @@
 import axios from "axios";
+import "dotenv/config";
 import StatusCodes from "http-status-codes";
 
 import {
@@ -9,8 +10,6 @@ import {
 import {getTeamsDTO, getFixturesDTO} from "../helpers/helpers.js";
 
 import {cache} from "../cache/index.js";
-
-process.loadEnvFile();
 
 axios.defaults.baseURL = BASE_URL;
 axios.defaults.headers.common['X-Auth-Token'] = process.env.API_KEY;

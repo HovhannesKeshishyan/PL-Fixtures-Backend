@@ -1,7 +1,6 @@
+import "dotenv/config";
 import {GoogleGenAI} from "@google/genai";
 import {cache} from "../cache/index.js";
-
-process.loadEnvFile();
 
 const API_KEY = process.env.GEMINI_API_KEY;
 if (!API_KEY) {

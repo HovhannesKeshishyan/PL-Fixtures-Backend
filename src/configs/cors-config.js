@@ -1,6 +1,5 @@
+import "dotenv/config";
 import StatusCodes from "http-status-codes";
-
-process.loadEnvFile();
 
 const isOriginAllowed = (origin) => {
     if (process.env.NODE_ENV === "production") {

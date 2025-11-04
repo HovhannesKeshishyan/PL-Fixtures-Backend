@@ -1,6 +1,5 @@
 import {createClient} from "redis";
-
-process.loadEnvFile();
+import "dotenv/config";
 
 class Database {
     static instance = null;

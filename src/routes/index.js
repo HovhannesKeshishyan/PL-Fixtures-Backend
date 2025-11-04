@@ -9,7 +9,7 @@ import {predictScoresValidator} from"../validators/predictScoresValidators.js";
 const router = express.Router();
 
 router.get("/", function (req, res) {
-    res.send("Welcome to the server!");
+    res.send("WELCOME TO THE SERVER!");
 })
 
 router.get("/api/teams", getLeagueTeams);

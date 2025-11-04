@@ -1,5 +1,6 @@
-const {GoogleGenAI} = require("@google/genai");
-const {cache} = require("../cache/index");
+import "dotenv/config";
+import {GoogleGenAI} from "@google/genai";
+import {cache} from "../cache/index.js";
 
 const API_KEY = process.env.GEMINI_API_KEY;
 if (!API_KEY) {
@@ -22,7 +23,7 @@ function createUserPrompt(homeTeam, awayTeam, matchDate) {
     return `Predict the final score for the match: ${homeTeam} vs ${awayTeam}, scheduled for ${matchDate}.`;
 }
 
-async function predictScores(req, res, next) {
+export async function predictScores(req, res, next) {
     const {matchUUID, homeTeam, awayTeam, matchDate} = req.body;
 
     const predictionFromCache = cache.getPrediction(matchUUID);
@@ -58,5 +59,3 @@ async function predictScores(req, res, next) {
         return next(error);
     }
 }
-
-module.exports = {predictScores};

@@ -1,15 +1,17 @@
-const express = require('express');
-require("dotenv").config();
-const helmet = require("helmet");
-const rateLimit = require("express-rate-limit");
-const cors = require("cors");
-const {INTERNAL_SERVER_ERROR} = require("http-status-codes");
+import express from "express";
+import helmet from "helmet";
+import rateLimit from "express-rate-limit";
+import cors from "cors";
+import "dotenv/config";
+import "dotenv/config";
+import StatusCodes from "http-status-codes";
+
+import corsConfig from "./configs/cors-config.js";
+import rateLimitConfig from "./configs/rate-limit-config.js";
+
+import router from "./routes/index.js";
 
 const PORT = process.env.PORT || 3000;
-const corsConfig = require("./configs/cors-config");
-const rateLimitConfig = require("./configs/rate-limit-config");
-
-const router = require("./routes");
 
 const app = express();
 app.use(helmet());
@@ -25,10 +27,10 @@ function errorHandler(err, req, res, _next) {
     console.log("***** ERROR LOG *****");
     console.log(err);
     console.log("***** ERROR LOG *****");
-    res.status(err.status || INTERNAL_SERVER_ERROR).send(err.message || "Server Error");
+    res.status(err.status || StatusCodes.INTERNAL_SERVER_ERROR).send(err.message || "Server Error");
 }
 
 app.listen(PORT, () => console.log(`Listening on port ${PORT}`));
 
 //for Vercel deploy
-module.exports = app;
+export default app;

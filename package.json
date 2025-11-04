@@ -1,8 +1,9 @@
 {
   "name": "pl-fixtures",
-  "version": "1.0.0",
+  "version": "2.0.1",
   "description": "Premier League Fixtures",
   "main": "src/index.js",
+  "type": "module",
   "scripts": {
     "start": "nodemon src/index.js"
   },
@@ -19,11 +20,12 @@
     "@google/genai": "^1.28.0",
     "axios": "^1.13.1",
     "cors": "^2.8.5",
-    "dotenv": "^16.4.7",
+    "dotenv": "^17.2.3",
     "express": "^4.21.2",
     "express-rate-limit": "^7.5.0",
     "helmet": "^8.0.0",
     "http-status-codes": "^2.3.0",
-    "nodemon": "^3.1.9"
+    "nodemon": "^3.1.9",
+    "redis": "^5.9.0"
   }
 }

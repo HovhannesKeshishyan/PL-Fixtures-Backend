@@ -1,12 +1,15 @@
-const express = require('express');
-const router = express.Router();
-const {getLeagueTeams, getTeamsFixtures} = require("../controllers/fixturesController");
-const {predictScores} = require("../controllers/predictionsController");
-const {teamsFixturesValidator} = require("../validators/fixturesValidators");
-const {predictScoresValidator} = require("../validators/predictScoresValidators");
+import express from "express";
 
-router.get('/', function (req, res) {
-    res.send('Welcome to the server!');
+import {getLeagueTeams, getTeamsFixtures} from"../controllers/fixturesController.js";
+import {predictScores} from"../controllers/predictionsController.js";
+
+import {teamsFixturesValidator} from"../validators/fixturesValidators.js";
+import {predictScoresValidator} from"../validators/predictScoresValidators.js";
+
+const router = express.Router();
+
+router.get("/", function (req, res) {
+    res.send("Welcome to the server!");
 })
 
 router.get("/api/teams", getLeagueTeams);
@@ -15,4 +18,4 @@ router.post("/api/fixtures", teamsFixturesValidator, getTeamsFixtures);
 
 router.post("/api/predict-scores", predictScoresValidator, predictScores);
 
-module.exports = router;
+export default router;

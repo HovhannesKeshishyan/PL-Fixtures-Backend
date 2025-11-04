@@ -1,6 +1,6 @@
-const {BAD_REQUEST} = require("http-status-codes");
+import StatusCodes from "http-status-codes";
 
-const teamsFixturesValidator = (req, res, next) => {
+export const teamsFixturesValidator = (req, res, next) => {
     const {ids, limit} = req.body;
     // team ids
     let errorMessage = "";
@@ -13,9 +13,7 @@ const teamsFixturesValidator = (req, res, next) => {
     if (!errorMessage) next();
     else {
         const err = new Error(errorMessage);
-        err.status = BAD_REQUEST;
+        err.status = StatusCodes.BAD_REQUEST;
         next(err);
     }
 }
-
-module.exports = {teamsFixturesValidator}

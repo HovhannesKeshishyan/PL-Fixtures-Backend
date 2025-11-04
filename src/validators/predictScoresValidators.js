@@ -1,8 +1,8 @@
-const {BAD_REQUEST} = require("http-status-codes");
+import StatusCodes from "http-status-codes";
 
 const isValidString = str => typeof str === "string" && str.trim().length > 0;
 
-const predictScoresValidator = (req, res, next) => {
+export const predictScoresValidator = (req, res, next) => {
     const {matchUUID, homeTeam, awayTeam, matchDate} = req.body;
 
     const requiredParams = [matchUUID, homeTeam, awayTeam, matchDate];
@@ -30,8 +30,6 @@ const predictScoresValidator = (req, res, next) => {
     }
 
     const err = new Error(errorMessage);
-    err.status = BAD_REQUEST;
+    err.status = StatusCodes.BAD_REQUEST;
     next(err);
 }
-
-module.exports = {predictScoresValidator}

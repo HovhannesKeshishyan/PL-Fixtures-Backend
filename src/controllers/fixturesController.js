@@ -1,14 +1,16 @@
-const axios = require("axios");
-const {BAD_REQUEST} = require("http-status-codes");
+import axios from "axios";
+import StatusCodes from "http-status-codes";
 
-const {
+import {
     BASE_URL,
     PREMIER_LEAGUE_CODE
-} = require("../constants/constants");
+} from "../constants/constants.js";
 
-const {getTeamsDTO, getFixturesDTO} = require("../helpers/helpers");
+import {getTeamsDTO, getFixturesDTO} from "../helpers/helpers.js";
 
-const {cache} = require("../cache/index");
+import {cache} from "../cache/index.js";
+
+process.loadEnvFile();
 
 axios.defaults.baseURL = BASE_URL;
 axios.defaults.headers.common['X-Auth-Token'] = process.env.API_KEY;
@@ -26,8 +28,8 @@ const fetchTeams = async () => {
     }
 }
 
-const getLeagueTeams = async (req, res, next) => {
-    if (cache.teamsCacheIsValid()) {
+export const getLeagueTeams = async (req, res, next) => {
+    if (cache.isTeamsCacheValid()) {
         return res.json(cache.getTeams());
     }
 
@@ -36,7 +38,7 @@ const getLeagueTeams = async (req, res, next) => {
     res.json(teams);
 }
 
-const getTeamsFixtures = async (req, res, next) => {
+export const getTeamsFixtures = async (req, res, next) => {
     if (!cache.getTeamsIds().length) {
         await fetchTeams();
     }
@@ -47,15 +49,15 @@ const getTeamsFixtures = async (req, res, next) => {
     const invalidIds = ids.filter(id => !teamIds.includes(id));
     if (invalidIds.length) {
         const error = new Error("Team ids are invalid: " + invalidIds.join(", "));
-        error.status = BAD_REQUEST;
+        error.status = StatusCodes.BAD_REQUEST;
         return next(error);
     }
 
     try {
-        if (cache.fixturesCacheIsValid()) {
+        if (cache.isFixturesCacheValid()) {
             console.log("From Cache");
         } else {
-            cache.clearFixtures();
+            cache.clearFixturesValue();
             const {data} = await axios.get(`/competitions/${PREMIER_LEAGUE_CODE}/matches?status=SCHEDULED`);
             data.matches = getFixturesDTO(data.matches);
             data.matches.forEach(match => {
@@ -95,5 +97,3 @@ const getTeamsFixtures = async (req, res, next) => {
         next(error);
     }
 }
-
-module.exports = {getLeagueTeams, getTeamsFixtures}

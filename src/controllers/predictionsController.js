@@ -1,6 +1,7 @@
 import "dotenv/config";
 import {GoogleGenAI} from "@google/genai";
 import {cache} from "../cache/index.js";
+import {getPredictionDTO} from "../helpers/helpers.js";
 
 const API_KEY = process.env.GEMINI_API_KEY;
 if (!API_KEY) {
@@ -29,7 +30,7 @@ export async function predictScores(req, res, next) {
     const predictionFromCache = cache.getPrediction(matchUUID);
     if (predictionFromCache) {
         console.log(`Prediction for ${homeTeam} - ${awayTeam} returned from cache, match uuid is ${matchUUID}`);
-        return res.json({score: predictionFromCache.score});
+        return res.json(getPredictionDTO(predictionFromCache));
     }
 
     try {
@@ -44,12 +45,18 @@ export async function predictScores(req, res, next) {
         const score = response.text.trim();
         const lastUpdated = new Date();
 
+        const newPrediction = {
+            homeTeam,
+            awayTeam,
+            matchDate,
+            score,
+            lastUpdated
+        }
+
+        // check if score value contains only score without any other text, example 2-0
         if (/^\d+-\d+$/.test(score)) {
-            cache.setPrediction(matchUUID, {
-                score,
-                lastUpdated,
-            });
-            return res.json({score, lastUpdated});
+            cache.setPrediction(matchUUID, newPrediction);
+            return res.json(getPredictionDTO(newPrediction));
         } else {
             console.error("Unexpected format:", score);
             return next(new Error("Prediction format error"));

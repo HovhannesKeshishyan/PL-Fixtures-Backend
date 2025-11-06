@@ -20,3 +20,11 @@ export const getFixturesDTO = (matches) => {
         return {id, uuid, utcDate, lastUpdated, homeTeam, awayTeam}
     });
 }
+
+/**
+ * @param {{score: string, homeTeam: string, awayTeam: string, matchDate: string, lastUpdated: Date}} prediction - Prediction.
+ * @returns {{score: string}}
+ */
+export const getPredictionDTO = (prediction) => {
+    return {score: prediction.score};
+}

@@ -1,5 +1,7 @@
-import {ONE_WEEK, FIVE_MINUTES} from "../constants/constants.js";
+import {ONE_WEEK, FIVE_MINUTES, REDIS_CACHE_NAME_PROD, REDIS_CACHE_NAME_DEV} from "../constants/constants.js";
 import {DB} from "../db/redis.js";
+
+const REDIS_CACHE_KEY = process.env.NODE_ENV === "production" ? REDIS_CACHE_NAME_PROD : REDIS_CACHE_NAME_DEV;
 
 function getCacheInitialValues() {
     return {
@@ -35,10 +37,10 @@ class Cache {
     async initCache() {
         try {
             const client = await DB.connect();
-            const result = client && await client.get("CACHE");
+            const result = client && await client.get(REDIS_CACHE_KEY);
             this.cache = result ? JSON.parse(result) : getCacheInitialValues();
         } catch (err) {
-            console.error("Cache init failed:", err);
+            console.error("Cache init from redis failed:", err);
             this.cache = getCacheInitialValues();
         }
     }
@@ -49,7 +51,7 @@ class Cache {
             try {
                 const client = DB.getClient();
                 if (client) {
-                    await client.set("CACHE", JSON.stringify(this.cache));
+                    await client.set(REDIS_CACHE_KEY, JSON.stringify(this.cache));
                     console.log("Cache is saved in Redis")
                 }
             } catch (err) {
@@ -65,7 +67,7 @@ class Cache {
 
     /**
      * @param {string} matchID - ID of the match.
-     * @returns {{score: string | null, lastUpdated: string}}
+     * @returns {{score: string, homeTeam: string, awayTeam: string, matchDate: Date, lastUpdated: string}}
      */
     getPrediction(matchID) {
         return this.cache.predictions[matchID] || null;
@@ -73,7 +75,7 @@ class Cache {
 
     /**
      * @param {string} matchID - ID of the match.
-     * @param {{score: string, lastUpdated: Date}} prediction - Predicted score.
+     * @param {{score: string, homeTeam: string, awayTeam: string, matchDate: string, lastUpdated: Date}} prediction - Predicted.
      */
     setPrediction(matchID, prediction) {
         this.cache.predictions[matchID] = prediction;

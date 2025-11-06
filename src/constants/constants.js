@@ -12,3 +12,7 @@ export const PREMIER_LEAGUE_CODE = "PL";
 
 // RATE LIMIT
 export const RATE_LIMIT_TIME = 15 * ONE_MINUTE;
+
+// REDIS
+export const REDIS_CACHE_NAME_PROD = "CACHE";
+export const REDIS_CACHE_NAME_DEV = "CACHE-DEV";

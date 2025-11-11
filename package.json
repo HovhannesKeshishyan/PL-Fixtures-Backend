@@ -13,7 +13,10 @@
     "Premier",
     "League",
     "Football",
-    "Soccer"
+    "Soccer",
+    "Fixtures",
+    "Scores",
+    "Championship"
   ],
   "author": "HK",
   "license": "ISC",

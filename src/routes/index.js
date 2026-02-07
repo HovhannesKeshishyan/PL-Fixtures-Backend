@@ -1,20 +1,14 @@
 import express from "express";
-
-import {getHomePage} from"../controllers/homeController.js";
-import {getLeagueTeams, getTeamsFixtures} from"../controllers/fixturesController.js";
-import {predictScores} from"../controllers/predictionsController.js";
-
-import {teamsFixturesValidator} from"../validators/fixturesValidators.js";
-import {predictScoresValidator} from"../validators/predictScoresValidators.js";
-
 const router = express.Router();
+
+import {getHomePage} from"../controllers/v1/homeController.js";
+
+import routerV1 from "./v1/index.js"
+import routerV2 from "./v2/index.js"
 
 router.get("/", getHomePage);
 
-router.get("/api/teams", getLeagueTeams);
-
-router.post("/api/fixtures", teamsFixturesValidator, getTeamsFixtures);
-
-router.post("/api/predict-scores", predictScoresValidator, predictScores);
+router.use("/api/v1", routerV1);
+router.use("/api/v2", routerV2);
 
 export default router;

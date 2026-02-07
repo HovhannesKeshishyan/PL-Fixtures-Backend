@@ -1,7 +1,7 @@
 import "dotenv/config";
 import {GoogleGenAI} from "@google/genai";
-import {cache} from "../cache/index.js";
-import {getPredictionDTO} from "../helpers/helpers.js";
+import {cache} from "../../cache/index.js";
+import {getPredictionDTO} from "../../helpers/helpers.js";
 
 const API_KEY = process.env.GEMINI_API_KEY;
 if (!API_KEY) {
@@ -25,6 +25,8 @@ function createUserPrompt(homeTeam, awayTeam, matchDate) {
 }
 
 export async function predictScores(req, res, next) {
+    res.setHeader("Deprecation", "true");
+    res.setHeader("Link", "</api/v2/predict-scores>; rel=\"successor-version\"");
     const {matchUUID, homeTeam, awayTeam, matchDate} = req.body;
 
     const predictionFromCache = cache.getPrediction(matchUUID);

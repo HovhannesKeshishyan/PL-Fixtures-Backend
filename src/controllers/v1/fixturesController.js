@@ -5,11 +5,11 @@ import StatusCodes from "http-status-codes";
 import {
     BASE_URL,
     PREMIER_LEAGUE_CODE
-} from "../constants/constants.js";
+} from "../../constants/constants.js";
 
-import {getTeamsDTO, getFixturesDTO} from "../helpers/helpers.js";
+import {getTeamsDTO, getFixturesDTO} from "../../helpers/helpers.js";
 
-import {cache} from "../cache/index.js";
+import {cache} from "../../cache/index.js";
 
 axios.defaults.baseURL = BASE_URL;
 axios.defaults.headers.common['X-Auth-Token'] = process.env.API_KEY;

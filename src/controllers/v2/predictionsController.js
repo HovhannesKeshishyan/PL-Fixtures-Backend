@@ -1,30 +1,35 @@
 import "dotenv/config";
-import {GoogleGenAI} from "@google/genai";
-import {cache} from "../../cache/index.js";
-import {getPredictionDTO} from "../../helpers/helpers.js";
+import OpenAI from "openai";
+import { cache } from "../../cache/index.js";
+import { getPredictionDTO } from "../../helpers/helpers.js";
 
-const API_KEY = process.env.GEMINI_API_KEY;
+const API_KEY = process.env.OPENAI_API_KEY;
 if (!API_KEY) {
-    throw new Error("GEMINI_API_KEY environment variable not set.");
+    throw new Error("OPENAI_API_KEY environment variable not set.");
 }
 
-const ai = new GoogleGenAI({
+const openai = new OpenAI({
     apiKey: API_KEY,
 });
 
 const predictionSchema = {
-    type: "object",
-    properties: {
-        homeTeam: {
-            type: "number",
-            description: "Goals scored by the home team"
+    name: "football_prediction",
+    strict: true,
+    schema: {
+        type: "object",
+        properties: {
+            homeTeam: {
+                type: "number",
+                description: "Goals scored by the home team"
+            },
+            awayTeam: {
+                type: "number",
+                description: "Goals scored by the away team"
+            }
         },
-        awayTeam: {
-            type: "number",
-            description: "Goals scored by the away team"
-        }
-    },
-    required: ["homeTeam", "awayTeam"]
+        required: ["homeTeam", "awayTeam"],
+        additionalProperties: false
+    }
 };
 
 const isPredictionResponseValid = (data) => {
@@ -38,18 +43,18 @@ const isPredictionResponseValid = (data) => {
 };
 
 const systemInstruction =
-    "You are an expert football predictor. " +
-    "Return ONLY valid JSON matching the provided schema. " +
-    "Do not include explanations, markdown, or extra text.";
+    "You are an expert football analyst and score predictor. " +
+    "Base your predictions on team form, historical head-to-head data, " +
+    "and home/away performance trends.";
 
-const model = "gemini-2.5-flash";
+const model = "gpt-4o-mini";
 
 function createUserPrompt(homeTeam, awayTeam, matchDate) {
-    return `Predict the final score for the football match: ${homeTeam} vs ${awayTeam}, scheduled for ${matchDate}. where homeTeam is ${homeTeam} and awayTeam = ${awayTeam}`;
+    return `Predict the final score for the football match: ${homeTeam} vs ${awayTeam}, scheduled for ${matchDate}.`;
 }
 
 export async function predictScores(req, res, next) {
-    const {matchUUID, homeTeam, awayTeam, matchDate} = req.body;
+    const { matchUUID, homeTeam, awayTeam, matchDate } = req.body;
 
     const predictionFromCache = cache.getPrediction(matchUUID);
     if (predictionFromCache) {
@@ -58,24 +63,27 @@ export async function predictScores(req, res, next) {
     }
 
     try {
-        const response = await ai.models.generateContent({
+        const response = await openai.chat.completions.create({
             model,
-            contents: createUserPrompt(homeTeam, awayTeam, matchDate),
-            config: {
-                responseMimeType: "application/json",
-                responseSchema: predictionSchema,
-                systemInstruction
+            messages: [
+                { role: "system", content: systemInstruction },
+                { role: "user", content: createUserPrompt(homeTeam, awayTeam, matchDate) }
+            ],
+            response_format: {
+                type: "json_schema",
+                json_schema: predictionSchema
             },
         });
 
-        const data = JSON.parse(response.text);
+        const data = JSON.parse(response.choices[0].message.content);
+
         if (!isPredictionResponseValid(data)) {
             console.error("Unexpected format:", data);
             return next(new Error("Prediction format error"));
         }
 
         const lastUpdated = new Date();
-        const score = `${data.homeTeam}-${data.awayTeam}`
+        const score = `${data.homeTeam}-${data.awayTeam}`;
 
         const newPrediction = {
             homeTeam,
@@ -83,12 +91,13 @@ export async function predictScores(req, res, next) {
             matchDate,
             score,
             lastUpdated
-        }
+        };
 
         cache.setPrediction(matchUUID, newPrediction);
         return res.json(getPredictionDTO(newPrediction));
+
     } catch (error) {
-        console.error("Gemini API call failed:", error);
+        console.error("OpenAI API call failed:", error);
         return next(error);
     }
 }

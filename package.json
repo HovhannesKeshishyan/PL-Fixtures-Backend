@@ -5,8 +5,8 @@
   "main": "src/index.js",
   "type": "module",
   "scripts": {
-    "start": "node src/index.js",
-    "dev": "nodemon src/index.js"
+    "start": "node --import ./src/sentry/instrument.js src/index.js",
+    "dev": "nodemon --import ./src/sentry/instrument.js src/index.js"
   },
   "keywords": [
     "Pl",
@@ -22,6 +22,7 @@
   "license": "ISC",
   "dependencies": {
     "@google/genai": "^1.48.0",
+    "@sentry/node": "^10.47.0",
     "axios": "^1.13.1",
     "cors": "^2.8.5",
     "dotenv": "^17.2.3",

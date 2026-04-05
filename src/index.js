@@ -3,12 +3,11 @@ import helmet from "helmet";
 import rateLimit from "express-rate-limit";
 import cors from "cors";
 import "dotenv/config";
-import "dotenv/config";
 import StatusCodes from "http-status-codes";
+import * as Sentry from "@sentry/node";
 
 import corsConfig from "./configs/cors-config.js";
 import rateLimitConfig from "./configs/rate-limit-config.js";
-
 import router from "./routes/index.js";
 
 const PORT = process.env.PORT || 3000;
@@ -21,6 +20,7 @@ app.use(express.json());
 app.use(express.urlencoded({extended: true}));
 app.use(router);
 
+Sentry.setupExpressErrorHandler(app);
 app.use(errorHandler);
 
 function errorHandler(err, req, res, _next) {

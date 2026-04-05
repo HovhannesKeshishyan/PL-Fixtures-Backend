@@ -1,10 +1,12 @@
+import "./sentry/instrument.js";
+
 import express from "express";
+import * as Sentry from "@sentry/node";
 import helmet from "helmet";
 import rateLimit from "express-rate-limit";
 import cors from "cors";
 import "dotenv/config";
 import StatusCodes from "http-status-codes";
-import * as Sentry from "@sentry/node";
 
 import corsConfig from "./configs/cors-config.js";
 import rateLimitConfig from "./configs/rate-limit-config.js";

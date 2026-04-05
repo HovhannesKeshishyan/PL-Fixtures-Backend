@@ -11,4 +11,10 @@ router.get("/", getHomePage);
 router.use("/api/v1", routerV1);
 router.use("/api/v2", routerV2);
 
+//  todo remove this endpoint after successful test
+router.use("/test/sentry-error", (req, res) => {
+    const message = req.body.message || Date.now();
+    throw new Error(`Test Sentry error ${message}`);
+})
+
 export default router;

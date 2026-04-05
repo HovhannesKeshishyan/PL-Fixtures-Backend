@@ -1,7 +1,4 @@
-import "./sentry/instrument.js";
-
 import express from "express";
-import * as Sentry from "@sentry/node";
 import helmet from "helmet";
 import rateLimit from "express-rate-limit";
 import cors from "cors";
@@ -22,7 +19,6 @@ app.use(express.json());
 app.use(express.urlencoded({extended: true}));
 app.use(router);
 
-Sentry.setupExpressErrorHandler(app);
 app.use(errorHandler);
 
 function errorHandler(err, req, res, _next) {

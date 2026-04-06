@@ -31,7 +31,8 @@
     "helmet": "^8.0.0",
     "http-status-codes": "^2.3.0",
     "openai": "^6.33.0",
-    "redis": "^5.9.0"
+    "redis": "^5.9.0",
+    "zod": "^4.3.6"
   },
   "devDependencies": {
     "nodemon": "^3.1.11"

@@ -1,7 +1,9 @@
 import "dotenv/config";
 import OpenAI from "openai";
-import { cache } from "../../cache/index.js";
-import { getPredictionDTO } from "../../helpers/helpers.js";
+import {zodTextFormat} from "openai/helpers/zod";
+import {z} from "zod";
+import {cache} from "../../cache/index.js";
+import {getPredictionDTO} from "../../helpers/helpers.js";
 
 const API_KEY = process.env.OPENAI_API_KEY;
 if (!API_KEY) {
@@ -12,25 +14,10 @@ const openai = new OpenAI({
     apiKey: API_KEY,
 });
 
-const predictionSchema = {
-    name: "football_prediction",
-    strict: true,
-    schema: {
-        type: "object",
-        properties: {
-            homeTeam: {
-                type: "number",
-                description: "Goals scored by the home team"
-            },
-            awayTeam: {
-                type: "number",
-                description: "Goals scored by the away team"
-            }
-        },
-        required: ["homeTeam", "awayTeam"],
-        additionalProperties: false
-    }
-};
+const ScoreSchema = z.object({
+    homeTeam: z.number().int().min(0),
+    awayTeam: z.number().int().min(0)
+});
 
 const isPredictionResponseValid = (data) => {
     return (
@@ -42,19 +29,19 @@ const isPredictionResponseValid = (data) => {
     );
 };
 
-const systemInstruction =
+const systemPrompt =
     "You are an expert football analyst and score predictor. " +
     "Base your predictions on team form, historical head-to-head data, " +
     "and home/away performance trends.";
 
-const model = "gpt-4o-mini";
+const MODEL = "gpt-4.1-mini";
 
 function createUserPrompt(homeTeam, awayTeam, matchDate) {
     return `Predict the final score for the football match: ${homeTeam} vs ${awayTeam}, scheduled for ${matchDate}.`;
 }
 
 export async function predictScores(req, res, next) {
-    const { matchUUID, homeTeam, awayTeam, matchDate } = req.body;
+    const {matchUUID, homeTeam, awayTeam, matchDate} = req.body;
 
     const predictionFromCache = cache.getPrediction(matchUUID);
     if (predictionFromCache) {
@@ -63,19 +50,21 @@ export async function predictScores(req, res, next) {
     }
 
     try {
-        const response = await openai.chat.completions.create({
-            model,
-            messages: [
-                { role: "system", content: systemInstruction },
-                { role: "user", content: createUserPrompt(homeTeam, awayTeam, matchDate) }
+        const response = await openai.responses.parse({
+            model: MODEL,
+            input: [
+                {role: "system", content: systemPrompt},
+                {
+                    role: "user",
+                    content: createUserPrompt(homeTeam, awayTeam, matchDate),
+                },
             ],
-            response_format: {
-                type: "json_schema",
-                json_schema: predictionSchema
+            text: {
+                format: zodTextFormat(ScoreSchema, "event"),
             },
         });
 
-        const data = JSON.parse(response.choices[0].message.content);
+        const data = response.output_parsed;
 
         if (!isPredictionResponseValid(data)) {
             console.error("Unexpected format:", data);

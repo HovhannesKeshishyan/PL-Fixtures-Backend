@@ -31,8 +31,7 @@ const corsConfig = {
             callback(null, false);
         }
     },
-    methods: "GET,HEAD",
-    // methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
+    methods: ["HEAD", "GET", "POST"],
     credentials: true,  // Enable credentials (cookies, authorization headers, etc.)
     optionsSuccessStatus: StatusCodes.NO_CONTENT,  // Respond with a 204 No Content on preflight requests
 };

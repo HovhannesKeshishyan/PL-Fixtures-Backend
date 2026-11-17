@@ -15,10 +15,11 @@ const isLocalhost = (origin) => {
 };
 
 const isOriginAllowed = (origin) => {
-    if (process.env.NODE_ENV === "production") {
-        return origin && origin === process.env.FRONT_END_ORIGIN;
-    }
-    return !origin || origin === process.env.FRONT_END_ORIGIN || isLocalhost(origin);
+    if (!origin) return true;
+
+    if (origin === process.env.FRONT_END_ORIGIN) return true;
+
+    return !!(process.env.NODE_ENV !== "production" && isLocalhost(origin));
 }
 
 const corsConfig = {

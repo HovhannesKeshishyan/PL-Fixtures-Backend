@@ -1,11 +1,25 @@
 import "dotenv/config";
 import StatusCodes from "http-status-codes";
 
-const isOriginAllowed = (origin) => {
-    if (process.env.NODE_ENV === "production") {
-        return origin && origin === process.env.FRONT_END_ORIGIN;
+const isLocalhost = (origin) => {
+    try {
+        const url = new URL(origin);
+
+        return (
+            url.protocol === "http:" &&
+            ["localhost", "127.0.0.1"].includes(url.hostname)
+        );
+    } catch {
+        return false;
     }
-    return !origin || origin === process.env.FRONT_END_ORIGIN || origin.startsWith("http://localhost");
+};
+
+const isOriginAllowed = (origin) => {
+    if (!origin) return true;
+
+    if (origin === process.env.FRONT_END_ORIGIN) return true;
+
+    return !!(process.env.NODE_ENV !== "production" && isLocalhost(origin));
 }
 
 const corsConfig = {
@@ -17,8 +31,7 @@ const corsConfig = {
             callback(null, false);
         }
     },
-    methods: "GET,HEAD",
-    // methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
+    methods: ["HEAD", "GET", "POST"],
     credentials: true,  // Enable credentials (cookies, authorization headers, etc.)
     optionsSuccessStatus: StatusCodes.NO_CONTENT,  // Respond with a 204 No Content on preflight requests
 };

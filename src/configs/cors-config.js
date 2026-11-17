@@ -1,11 +1,24 @@
 import "dotenv/config";
 import StatusCodes from "http-status-codes";
 
+const isLocalhost = (origin) => {
+    try {
+        const url = new URL(origin);
+
+        return (
+            url.protocol === "http:" &&
+            ["localhost", "127.0.0.1"].includes(url.hostname)
+        );
+    } catch {
+        return false;
+    }
+};
+
 const isOriginAllowed = (origin) => {
     if (process.env.NODE_ENV === "production") {
         return origin && origin === process.env.FRONT_END_ORIGIN;
     }
-    return !origin || origin === process.env.FRONT_END_ORIGIN || origin.startsWith("http://localhost");
+    return !origin || origin === process.env.FRONT_END_ORIGIN || isLocalhost(origin);
 }
 
 const corsConfig = {

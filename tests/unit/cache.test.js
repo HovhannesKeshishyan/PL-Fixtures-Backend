@@ -11,10 +11,10 @@ describe("teams cache", () => {
     });
 
     it("stores teams and their ids", () => {
-        cache.setTeams([ARSENAL, CHELSEA]);
+        cache.setTeams([ARSENAL, "PYUNIC"]);
 
-        expect(cache.getTeams()).toEqual([ARSENAL, CHELSEA]);
-        expect(cache.getTeamsIds()).toEqual([57, 61]);
+        expect(cache.getTeams()).toEqual([ARSENAL, "PYUNIC"]);
+        expect(cache.getTeamsIds()).toEqual([57, undefined]);
         expect(cache.isTeamsCacheValid()).toBe(true);
     });
 

@@ -12,6 +12,7 @@ import rateLimitConfig from "./configs/rate-limit-config.js";
 import router from "./routes/index.js";
 
 const PORT = process.env.PORT || 3000;
+const IS_VERCEL = !!process.env.VERCEL;
 
 const app = express();
 // on Vercel requests come through a proxy, trust it so rate limiting uses the real client IP
@@ -24,8 +25,6 @@ app.use(router);
 
 Sentry.setupExpressErrorHandler(app);
 app.use(errorHandler);
-
-const IS_VERCEL = !!process.env.VERCEL;
 
 const isValidErrorStatus = (status) => Number.isInteger(status) && status >= 400 && status < 600;
 
@@ -53,7 +52,10 @@ async function errorHandler(err, req, res, _next) {
     res.status(StatusCodes.INTERNAL_SERVER_ERROR).send("Server Error");
 }
 
-app.listen(PORT, () => console.log(`Listening on port ${PORT}`));
+// on Vercel the exported app is used as the request handler, no server needed
+if (!IS_VERCEL) {
+    app.listen(PORT, () => console.log(`Listening on port ${PORT}`));
+}
 
 //for Vercel deploy
 export default app;

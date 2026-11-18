@@ -28,6 +28,14 @@ app.use(errorHandler);
 
 const IS_VERCEL = !!process.env.VERCEL;
 
+const isValidErrorStatus = (status) => Number.isInteger(status) && status >= 400 && status < 600;
+
+// Errors safe to show to the client:
+// - errors created in this app with `new Error()` and an explicit status
+// - Express/body-parser errors marked with `expose` (e.g. invalid JSON)
+// Other errors (axios, OpenAI, Gemini, ...) may contain internal details, so they get a generic 500.
+const isClientSafeError = (err) => isValidErrorStatus(err.status) && (err.constructor === Error || err.expose === true);
+
 async function errorHandler(err, req, res, _next) {
     console.log("***** ERROR LOG *****");
     console.log(err);
@@ -40,7 +48,10 @@ async function errorHandler(err, req, res, _next) {
         await Sentry.flush();
     }
 
-    res.status(err.status || StatusCodes.INTERNAL_SERVER_ERROR).send(err.message || "Server Error");
+    if (isClientSafeError(err)) {
+        return res.status(err.status).send(err.message);
+    }
+    res.status(StatusCodes.INTERNAL_SERVER_ERROR).send("Server Error");
 }
 
 app.listen(PORT, () => console.log(`Listening on port ${PORT}`));

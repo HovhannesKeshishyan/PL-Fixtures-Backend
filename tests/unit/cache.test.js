@@ -13,7 +13,7 @@ describe("teams cache", () => {
     it("stores teams and their ids", () => {
         cache.setTeams([ARSENAL, CHELSEA]);
 
-        expect(cache.getTeams()).toEqual([ARSENAL, CHELSEA]);
+        expect(cache.getTeams()).toEqual([ARSENAL, "PYUNIC"]);
         expect(cache.getTeamsIds()).toEqual([57, 61]);
         expect(cache.isTeamsCacheValid()).toBe(true);
     });

@@ -73,25 +73,21 @@ export const getTeamsFixtures = async (req, res, next) => {
         }
 
         const data = ids.map((id) => {
-            let teamData;
-            // Create a shallow copy of teamData
-            if (cache.getFixture(id)) {
-                teamData = {...cache.getFixture(id)}
-            }
-            // when no fixtures create empty array
-            else {
-                teamData = {teamId: id, matches: []}
-            }
-
-            // add prediction if exists
-            teamData.matches.forEach(match => {
-                match.aiPrediction = cache.getPrediction(match.uuid) || null;
-            })
+            // when no fixtures use empty array
+            let matches = cache.getFixture(id)?.matches || [];
 
             if (limit && limit !== "all") {
-                teamData.matches = [...teamData.matches].slice(0, limit);
+                matches = matches.slice(0, limit);
             }
-            return teamData;
+
+            // build new match objects, so cached matches are not mutated
+            return {
+                teamId: id,
+                matches: matches.map(match => ({
+                    ...match,
+                    aiPrediction: cache.getPrediction(match.uuid) || null,
+                })),
+            };
         })
 
         res.json(data);

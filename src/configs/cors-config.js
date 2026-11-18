@@ -14,25 +14,26 @@ const isLocalhost = (origin) => {
     }
 };
 
+// FRONT_END_ORIGIN can contain several origins separated by commas
+const allowedOrigins = (process.env.FRONT_END_ORIGIN || "")
+    .split(",")
+    .map(origin => origin.trim())
+    .filter(Boolean);
+
 const isOriginAllowed = (origin) => {
     if (!origin) return true;
 
-    if (origin === process.env.FRONT_END_ORIGIN) return true;
+    if (allowedOrigins.includes(origin)) return true;
 
     return !!(process.env.NODE_ENV !== "production" && isLocalhost(origin));
 }
 
 const corsConfig = {
     origin: function (origin, callback) {
-        // Check if the origin is in the allowedOrigins array or if it is undefined (e.g., Postman)
-        if (isOriginAllowed(origin)) {
-            callback(null, true);
-        } else {
-            callback(null, false);
-        }
+        // allow allowed origins and requests without origin (e.g. Postman, server-to-server)
+        callback(null, isOriginAllowed(origin));
     },
     methods: ["HEAD", "GET", "POST"],
-    credentials: true,  // Enable credentials (cookies, authorization headers, etc.)
     optionsSuccessStatus: StatusCodes.NO_CONTENT,  // Respond with a 204 No Content on preflight requests
 };
 

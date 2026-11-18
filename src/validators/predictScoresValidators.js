@@ -1,6 +1,8 @@
 import StatusCodes from "http-status-codes";
 import { cache } from "../cache/index.js";
 
+const REQUIRED_PARAMS = ["matchUUID", "homeTeam", "awayTeam", "matchDate"];
+
 const isValidString = (str) => typeof str === "string" && str.trim().length > 0;
 
 const findCachedMatch = (matchUUID) => {
@@ -15,7 +17,6 @@ const isSameTeam = (team, name) => team.name === name.trim();
 
 // only real scheduled matches with correct team names can be predicted
 const isKnownMatch = ({ matchUUID, homeTeam, awayTeam }) => {
-  console.log("isKnownMatch", matchUUID, homeTeam, awayTeam);
   const match = findCachedMatch(matchUUID);
   return (
     !!match &&
@@ -24,40 +25,30 @@ const isKnownMatch = ({ matchUUID, homeTeam, awayTeam }) => {
   );
 };
 
-export const predictScoresValidator = (req, res, next) => {
-  const { matchUUID, homeTeam, awayTeam, matchDate } = req.body;
-
-  const requiredParams = [matchUUID, homeTeam, awayTeam, matchDate];
-
-  const allIsValid =
-    requiredParams.every((p) => isValidString(p)) &&
-    !isNaN(Date.parse(matchDate));
-
-  if (allIsValid) {
-    if (isKnownMatch(req.body)) return next();
-
-    const err = new Error("Invalid match data");
-    err.status = StatusCodes.BAD_REQUEST;
-    return next(err);
-  }
-
-  let errorMessage = "";
-  const emptyParams = [];
-  ["matchUUID", "homeTeam", "awayTeam", "matchDate"].forEach((param) => {
-    if (!isValidString(req.body[param])) {
-      emptyParams.push(param);
-    }
-  });
-
-  if (emptyParams.length) {
-    errorMessage += `Fields are required: ${emptyParams.join(", ")}. `;
-  }
-
-  if (isNaN(Date.parse(matchDate))) {
-    errorMessage += "matchDate must be valid date";
-  }
-
-  const err = new Error(errorMessage);
+const createBadRequestError = (message) => {
+  const err = new Error(message);
   err.status = StatusCodes.BAD_REQUEST;
-  next(err);
+  return err;
+};
+
+export const predictScoresValidator = (req, res, next) => {
+  const emptyParams = REQUIRED_PARAMS.filter((param) => !isValidString(req.body[param]));
+  const isDateValid = !isNaN(Date.parse(req.body.matchDate));
+
+  if (emptyParams.length || !isDateValid) {
+    let errorMessage = "";
+    if (emptyParams.length) {
+      errorMessage += `Fields are required: ${emptyParams.join(", ")}. `;
+    }
+    if (!isDateValid) {
+      errorMessage += "matchDate must be valid date";
+    }
+    return next(createBadRequestError(errorMessage));
+  }
+
+  if (!isKnownMatch(req.body)) {
+    return next(createBadRequestError("Invalid match data"));
+  }
+
+  next();
 };

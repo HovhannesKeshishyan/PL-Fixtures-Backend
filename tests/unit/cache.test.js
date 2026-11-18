@@ -1,7 +1,7 @@
 import {describe, expect, it, vi} from "vitest";
 
 import {cache} from "../../src/cache/index.js";
-import {ARSENAL, CHELSEA, MATCHES} from "../helpers/footballData.js";
+import {ARSENAL, MATCHES} from "../helpers/footballData.js";
 
 const DAY = 24 * 60 * 60 * 1000;
 

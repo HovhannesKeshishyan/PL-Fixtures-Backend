@@ -14,6 +14,8 @@ import router from "./routes/index.js";
 const PORT = process.env.PORT || 3000;
 
 const app = express();
+// on Vercel requests come through a proxy, trust it so rate limiting uses the real client IP
+if (process.env.VERCEL) app.set("trust proxy", 1);
 app.use(helmet());
 app.use(cors(corsConfig));
 app.use(rateLimit(rateLimitConfig));

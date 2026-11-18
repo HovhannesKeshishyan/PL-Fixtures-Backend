@@ -20,7 +20,6 @@ app.use(helmet());
 app.use(cors(corsConfig));
 app.use(rateLimit(rateLimitConfig));
 app.use(express.json());
-app.use(express.urlencoded({extended: true}));
 app.use(router);
 
 Sentry.setupExpressErrorHandler(app);

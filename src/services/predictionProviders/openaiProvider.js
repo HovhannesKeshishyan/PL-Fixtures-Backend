@@ -8,7 +8,7 @@ const openai = new OpenAI({
 
 const ScoreSchema = z.object({
     homeTeam: z.number().int().min(0),
-    awayTeam: z.number().int().min(0)
+    awayTeam: z.number().int().min(0),
 });
 
 const isPredictionResponseValid = (data) => {

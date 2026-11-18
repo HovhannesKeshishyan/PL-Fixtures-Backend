@@ -4,9 +4,9 @@ import * as fixturesService from "../../services/fixturesService.js";
 
 export const getLeagueTeams = async (req, res, next) => {
     const [error, teams] = await fixturesService.getLeagueTeams();
-    if (error) return next(error)
+    if (error) return next(error);
     res.json(teams);
-}
+};
 
 export const getTeamsFixtures = async (req, res, next) => {
     const [teamsError, teamIds] = await fixturesService.getTeamIds();
@@ -15,7 +15,7 @@ export const getTeamsFixtures = async (req, res, next) => {
     const ids = req.body.ids;
     const limit = req.body.limit || 5;
 
-    const invalidIds = ids.filter(id => !teamIds.includes(id));
+    const invalidIds = ids.filter((id) => !teamIds.includes(id));
     if (invalidIds.length) {
         const error = new Error("Team ids are invalid: " + invalidIds.join(", "));
         error.status = StatusCodes.BAD_REQUEST;
@@ -28,4 +28,4 @@ export const getTeamsFixtures = async (req, res, next) => {
     } catch (error) {
         next(error);
     }
-}
+};

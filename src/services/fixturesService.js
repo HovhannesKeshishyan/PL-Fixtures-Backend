@@ -1,10 +1,7 @@
 import axios from "axios";
 import StatusCodes from "http-status-codes";
 
-import {
-    BASE_URL,
-    PREMIER_LEAGUE_CODE
-} from "../constants/constants.js";
+import {BASE_URL, PREMIER_LEAGUE_CODE} from "../constants/constants.js";
 
 import {getTeamsDTO, getFixturesDTO} from "../helpers/helpers.js";
 
@@ -29,7 +26,7 @@ const fetchTeams = async () => {
         error.status = StatusCodes.BAD_GATEWAY;
         return [error, null];
     }
-}
+};
 
 /**
  * Returns teams from cache, or fetches them if the cache has expired.
@@ -40,7 +37,7 @@ export const getLeagueTeams = async () => {
         return [null, cache.getTeams()];
     }
     return fetchTeams();
-}
+};
 
 /**
  * Returns cached team ids, fetching teams first if the cache is empty.
@@ -52,7 +49,7 @@ export const getTeamIds = async () => {
         if (error) return [error, null];
     }
     return [null, cache.getTeamsIds()];
-}
+};
 
 const refreshFixturesIfExpired = async () => {
     if (cache.isFixturesCacheValid()) {
@@ -63,15 +60,15 @@ const refreshFixturesIfExpired = async () => {
     cache.clearFixturesValue();
     const {data} = await axios.get(`/competitions/${PREMIER_LEAGUE_CODE}/matches?status=SCHEDULED`);
     data.matches = getFixturesDTO(data.matches);
-    data.matches.forEach(match => {
+    data.matches.forEach((match) => {
         const homeTeamId = match.homeTeam.id;
         const awayTeamId = match.awayTeam.id;
         cache.addFixture(homeTeamId, match);
         cache.addFixture(awayTeamId, match);
-    })
+    });
     cache.setFixturesLastUpdate();
     console.log("From API");
-}
+};
 
 /**
  * Returns fixtures of the given teams with AI predictions, if they exist.
@@ -92,10 +89,10 @@ export const getTeamsFixtures = async (ids, limit) => {
         // build new match objects, so cached matches are not mutated
         return {
             teamId: id,
-            matches: matches.map(match => ({
+            matches: matches.map((match) => ({
                 ...match,
                 aiPrediction: cache.getPrediction(match.uuid) || null,
             })),
         };
-    })
-}
+    });
+};

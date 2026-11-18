@@ -1,5 +1,6 @@
 export const getHomePage = (req, res) => {
-    const mainStyles = "display: flex; flex-direction: column; align-items: center; justify-content: center; justify-content: center;";
+    const mainStyles =
+        "display: flex; flex-direction: column; align-items: center; justify-content: center; justify-content: center;";
     const titleStyles = "color: #01887c";
     const versionStyles = "font-size: 1.5rem";
 
@@ -9,4 +10,4 @@ export const getHomePage = (req, res) => {
            <h5 style="${versionStyles}">version <i>2.1.1</i></h5>
        </main>
     `);
-}
+};

@@ -28,7 +28,7 @@ export async function getPrediction(provider, {matchUUID, homeTeam, awayTeam, ma
             awayTeam,
             matchDate,
             score,
-            lastUpdated: new Date()
+            lastUpdated: new Date(),
         };
 
         cache.setPrediction(matchUUID, newPrediction);

@@ -26,7 +26,7 @@ export async function predictScore(homeTeam, awayTeam, matchDate) {
         model,
         contents: createUserPrompt(homeTeam, awayTeam, matchDate),
         config: {
-            systemInstruction
+            systemInstruction,
         },
     });
 

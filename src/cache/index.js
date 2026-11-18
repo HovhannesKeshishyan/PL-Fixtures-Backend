@@ -8,13 +8,13 @@ function getCacheInitialValues() {
         teams: {
             value: [],
             lastUpdated: null,
-            teamIds: []
+            teamIds: [],
         },
         fixtures: {
             value: {},
             lastUpdated: null,
         },
-        predictions: {}
+        predictions: {},
     };
 }
 
@@ -37,7 +37,7 @@ class Cache {
     async initCache() {
         try {
             const client = await DB.connect();
-            const result = client && await client.get(REDIS_CACHE_KEY);
+            const result = client && (await client.get(REDIS_CACHE_KEY));
             this.cache = result ? JSON.parse(result) : getCacheInitialValues();
             this.removeExpiredPredictions();
         } catch (err) {
@@ -53,7 +53,7 @@ class Cache {
                 const client = DB.getClient();
                 if (client) {
                     await client.set(REDIS_CACHE_KEY, JSON.stringify(this.cache));
-                    console.log("Cache is saved in Redis")
+                    console.log("Cache is saved in Redis");
                 }
             } catch (err) {
                 console.error("Failed to save cache:", err);
@@ -64,7 +64,6 @@ class Cache {
     saveCacheInDB() {
         this.saveCacheInRedis();
     }
-
 
     /**
      * @param {string} matchID - ID of the match.
@@ -119,7 +118,7 @@ class Cache {
     setTeams(teams) {
         this.cache.teams.value = teams;
         this.cache.teams.lastUpdated = Date.now();
-        this.cache.teams.teamIds = teams.map(team => team.id);
+        this.cache.teams.teamIds = teams.map((team) => team.id);
 
         this.saveCacheInDB();
     }
@@ -130,7 +129,7 @@ class Cache {
     isTeamsCacheValid() {
         const now = Date.now();
         const {value, lastUpdated} = this.cache.teams;
-        return value.length > 0 && lastUpdated && (now - lastUpdated < ONE_WEEK);
+        return value.length > 0 && lastUpdated && now - lastUpdated < ONE_WEEK;
     }
 
     getFixtures() {
@@ -174,7 +173,7 @@ class Cache {
     isFixturesCacheValid() {
         const now = Date.now();
         const {lastUpdated} = this.getFixtures();
-        return lastUpdated && (now - lastUpdated < FIVE_MINUTES);
+        return lastUpdated && now - lastUpdated < FIVE_MINUTES;
     }
 }
 

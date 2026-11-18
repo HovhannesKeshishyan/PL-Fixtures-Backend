@@ -6,7 +6,7 @@ export const teamsFixturesValidator = (req, res, next) => {
     let errorMessage = "";
     if (!ids || !ids.length) errorMessage = "ids is required";
     else if (!Array.isArray(ids)) errorMessage = "id must be an array";
-    else if (ids.some(id => typeof id !== "number")) errorMessage = "id must be a number";
+    else if (ids.some((id) => typeof id !== "number")) errorMessage = "id must be a number";
     // fixtures-list count
     if (limit && !parseInt(limit) && limit !== "all") errorMessage = "Limit must be a number";
 
@@ -16,4 +16,4 @@ export const teamsFixturesValidator = (req, res, next) => {
         err.status = StatusCodes.BAD_REQUEST;
         next(err);
     }
-}
+};

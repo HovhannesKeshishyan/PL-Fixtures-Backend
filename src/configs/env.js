@@ -15,14 +15,10 @@ const EnvSchema = z.object({
 });
 
 // treat empty values (e.g. "API_KEY=" in .env) as not set
-const definedEnv = Object.fromEntries(
-    Object.entries(process.env).filter(([, value]) => value !== "")
-);
+const definedEnv = Object.fromEntries(Object.entries(process.env).filter(([, value]) => value !== ""));
 
 const result = EnvSchema.safeParse(definedEnv);
 if (!result.success) {
-    const problems = result.error.issues
-        .map(issue => `  - ${issue.path.join(".")}: ${issue.message}`)
-        .join("\n");
+    const problems = result.error.issues.map((issue) => `  - ${issue.path.join(".")}: ${issue.message}`).join("\n");
     throw new Error(`Invalid environment variables:\n${problems}`);
 }

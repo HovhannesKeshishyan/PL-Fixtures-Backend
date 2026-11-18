@@ -39,6 +39,7 @@ class Cache {
             const client = await DB.connect();
             const result = client && await client.get(REDIS_CACHE_KEY);
             this.cache = result ? JSON.parse(result) : getCacheInitialValues();
+            this.removeExpiredPredictions();
         } catch (err) {
             console.error("Cache init from redis failed:", err);
             this.cache = getCacheInitialValues();
@@ -79,8 +80,23 @@ class Cache {
      */
     setPrediction(matchID, prediction) {
         this.cache.predictions[matchID] = prediction;
+        this.removeExpiredPredictions();
 
         this.saveCacheInDB();
+    }
+
+    /**
+     * Removes predictions for matches played more than a week ago, so the cache doesn't grow forever.
+     * Predictions without a valid matchDate are kept.
+     */
+    removeExpiredPredictions() {
+        const now = Date.now();
+        for (const [matchID, {matchDate}] of Object.entries(this.cache.predictions)) {
+            const matchTime = Date.parse(matchDate);
+            if (!isNaN(matchTime) && now - matchTime > ONE_WEEK) {
+                delete this.cache.predictions[matchID];
+            }
+        }
     }
 
     /**

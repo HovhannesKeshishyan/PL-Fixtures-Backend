@@ -1,15 +1,9 @@
-import "dotenv/config";
 import OpenAI from "openai";
 import {zodTextFormat} from "openai/helpers/zod";
 import {z} from "zod";
 
-const API_KEY = process.env.OPENAI_API_KEY;
-if (!API_KEY) {
-    throw new Error("OPENAI_API_KEY environment variable not set.");
-}
-
 const openai = new OpenAI({
-    apiKey: API_KEY,
+    apiKey: process.env.OPENAI_API_KEY,
 });
 
 const ScoreSchema = z.object({

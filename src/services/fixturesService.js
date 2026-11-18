@@ -1,5 +1,4 @@
 import axios from "axios";
-import "dotenv/config";
 import StatusCodes from "http-status-codes";
 
 import {

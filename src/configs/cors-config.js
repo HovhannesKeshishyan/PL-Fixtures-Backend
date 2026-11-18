@@ -1,4 +1,3 @@
-import "dotenv/config";
 import StatusCodes from "http-status-codes";
 
 const isLocalhost = (origin) => {

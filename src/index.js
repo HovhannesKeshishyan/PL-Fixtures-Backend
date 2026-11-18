@@ -1,8 +1,8 @@
+import "./configs/env.js"; // must be first: loads and validates environment variables
 import express from "express";
 import helmet from "helmet";
 import rateLimit from "express-rate-limit";
 import cors from "cors";
-import "dotenv/config";
 import StatusCodes from "http-status-codes";
 import * as Sentry from "@sentry/node";
 

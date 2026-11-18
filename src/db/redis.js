@@ -1,5 +1,4 @@
 import {createClient} from "redis";
-import "dotenv/config";
 
 const INITIAL_CONNECT_MAX_RETRIES = 3;
 const MAX_RECONNECT_DELAY_MS = 3000;

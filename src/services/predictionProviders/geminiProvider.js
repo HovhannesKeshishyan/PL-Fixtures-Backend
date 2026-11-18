@@ -1,13 +1,7 @@
-import "dotenv/config";
 import {GoogleGenAI} from "@google/genai";
 
-const API_KEY = process.env.GEMINI_API_KEY;
-if (!API_KEY) {
-    throw new Error("GEMINI_API_KEY environment variable not set.");
-}
-
 const ai = new GoogleGenAI({
-    apiKey: API_KEY,
+    apiKey: process.env.GEMINI_API_KEY,
 });
 
 const systemInstruction =

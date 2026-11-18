@@ -39,7 +39,12 @@ export const getLeagueTeams = async (req, res, next) => {
 
 export const getTeamsFixtures = async (req, res, next) => {
     if (!cache.getTeamsIds().length) {
-        await fetchTeams();
+        const [teamsError] = await fetchTeams();
+        if (teamsError) {
+            const error = new Error("Failed to load teams, please try again later");
+            error.status = StatusCodes.BAD_GATEWAY;
+            return next(error);
+        }
     }
     const ids = req.body.ids;
     const limit = req.body.limit || 5;

@@ -23,7 +23,9 @@ const fetchTeams = async () => {
 
         return [null, teams];
     } catch (err) {
-        return ["Something went wrong", null]
+        const error = new Error("Failed to load teams, please try again later", {cause: err});
+        error.status = StatusCodes.BAD_GATEWAY;
+        return [error, null];
     }
 }
 
@@ -40,11 +42,7 @@ export const getLeagueTeams = async (req, res, next) => {
 export const getTeamsFixtures = async (req, res, next) => {
     if (!cache.getTeamsIds().length) {
         const [teamsError] = await fetchTeams();
-        if (teamsError) {
-            const error = new Error("Failed to load teams, please try again later");
-            error.status = StatusCodes.BAD_GATEWAY;
-            return next(error);
-        }
+        if (teamsError) return next(teamsError);
     }
     const ids = req.body.ids;
     const limit = req.body.limit || 5;

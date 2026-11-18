@@ -11,7 +11,7 @@ import {getTeamsDTO, getFixturesDTO} from "../helpers/helpers.js";
 import {cache} from "../cache/index.js";
 
 axios.defaults.baseURL = BASE_URL;
-axios.defaults.headers.common['X-Auth-Token'] = process.env.API_KEY;
+axios.defaults.headers.common["X-Auth-Token"] = process.env.API_KEY;
 
 /**
  * @returns {Promise<[Error|null, {id: number, name: string, shortName: string, crest: string}[]|null]>}

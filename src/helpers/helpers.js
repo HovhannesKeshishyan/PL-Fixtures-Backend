@@ -16,7 +16,7 @@ export const getTeamsDTO = (data) => {
 export const getFixturesDTO = (matches) => {
     return matches.map(match => {
         const {id, utcDate, lastUpdated, homeTeam, awayTeam} = match;
-        const uuid = id + '-' + homeTeam.id + '-' + awayTeam.id; // match id alone sometimes is not unique
+        const uuid = id + "-" + homeTeam.id + "-" + awayTeam.id; // match id alone sometimes is not unique
         return {id, uuid, utcDate, lastUpdated, homeTeam, awayTeam}
     });
 }

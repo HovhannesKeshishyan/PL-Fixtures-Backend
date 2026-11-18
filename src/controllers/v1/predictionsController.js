@@ -1,70 +1,14 @@
-import "dotenv/config";
-import {GoogleGenAI} from "@google/genai";
-import {cache} from "../../cache/index.js";
-import {getPredictionDTO} from "../../helpers/helpers.js";
-
-const API_KEY = process.env.GEMINI_API_KEY;
-if (!API_KEY) {
-    throw new Error("GEMINI_API_KEY environment variable not set.");
-}
-
-const ai = new GoogleGenAI({
-    apiKey: API_KEY,
-});
-
-const systemInstruction =
-    "You are an expert football predictor. Your ONLY task is to provide a single " +
-    "final score prediction. The output must ONLY contain the score in " +
-    "'HomeScore-AwayScore' format (e.g., '2-1', '0-0'). " +
-    "DO NOT include any other text, explanation, or markdown formatting.";
-
-const model = "gemini-2.5-flash";
-
-function createUserPrompt(homeTeam, awayTeam, matchDate) {
-    return `Predict the final score for the match: ${homeTeam} vs ${awayTeam}, scheduled for ${matchDate}.`;
-}
+import {getPrediction} from "../../services/predictionService.js";
+import * as geminiProvider from "../../services/predictionProviders/geminiProvider.js";
 
 export async function predictScores(req, res, next) {
     res.setHeader("Deprecation", "true");
-    res.setHeader("Link", "</api/v2/predict-scores>; rel=\"successor-version\"");
-    const {matchUUID, homeTeam, awayTeam, matchDate} = req.body;
-
-    const predictionFromCache = cache.getPrediction(matchUUID);
-    if (predictionFromCache) {
-        console.log(`Prediction for ${homeTeam} - ${awayTeam} returned from cache, match uuid is ${matchUUID}`);
-        return res.json(getPredictionDTO(predictionFromCache));
-    }
+    res.setHeader("Link", '</api/v2/predict-scores>; rel="successor-version"');
 
     try {
-        const response = await ai.models.generateContent({
-            model,
-            contents: createUserPrompt(homeTeam, awayTeam, matchDate),
-            config: {
-                systemInstruction
-            },
-        });
-
-        const score = response.text.trim();
-        const lastUpdated = new Date();
-
-        const newPrediction = {
-            homeTeam,
-            awayTeam,
-            matchDate,
-            score,
-            lastUpdated
-        }
-
-        // check if score value contains only score without any other text, example 2-0
-        if (/^\d+-\d+$/.test(score)) {
-            cache.setPrediction(matchUUID, newPrediction);
-            return res.json(getPredictionDTO(newPrediction));
-        } else {
-            console.error("Unexpected format:", score);
-            return next(new Error("Prediction format error"));
-        }
+        const prediction = await getPrediction(geminiProvider, req.body);
+        res.json(prediction);
     } catch (error) {
-        console.error("Gemini API call failed:", error);
-        return next(error);
+        next(error);
     }
 }

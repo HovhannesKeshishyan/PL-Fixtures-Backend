@@ -1,12 +1,21 @@
 {
   "name": "premier-league-fixtures",
-  "version": "2.1.1",
+  "version": "3.0.0",
   "description": "Premier League Fixtures",
   "main": "src/index.js",
   "type": "module",
+  "engines": {
+    "node": "24.x"
+  },
   "scripts": {
     "start": "node src/index.js",
-    "dev": "nodemon src/index.js"
+    "dev": "nodemon src/index.js",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "format": "prettier . --write",
+    "format:check": "prettier . --check",
+    "test": "vitest run",
+    "test:watch": "vitest"
   },
   "keywords": [
     "Pl",
@@ -35,6 +44,13 @@
     "zod": "^4.3.6"
   },
   "devDependencies": {
-    "nodemon": "^3.1.11"
+    "@eslint/js": "^10.0.1",
+    "@stylistic/eslint-plugin": "^6.0.1",
+    "eslint": "^10.15.0",
+    "eslint-config-prettier": "^10.1.8",
+    "globals": "^17.14.0",
+    "nodemon": "^3.1.11",
+    "prettier": "3.10.1",
+    "vitest": "^5.1.1"
   }
 }

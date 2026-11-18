@@ -1,6 +1,6 @@
 {
   "name": "premier-league-fixtures",
-  "version": "2.1.1",
+  "version": "3.0.0",
   "description": "Premier League Fixtures",
   "main": "src/index.js",
   "type": "module",
